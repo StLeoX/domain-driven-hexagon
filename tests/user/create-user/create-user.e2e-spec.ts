@@ -8,6 +8,11 @@ import { getTestServer, TestServer } from '../../jestSetupAfterEnv';
 
 const feature = loadFeature('tests/user/create-user/create-user.feature');
 
+/**
+ * e2e test implementing a Gherkin feature file
+ * https://github.com/Sairyss/backend-best-practices#testing
+ */
+
 defineFeature(feature, test => {
   let testServer: TestServer;
   let httpServer: request.SuperTest<request.Test>;

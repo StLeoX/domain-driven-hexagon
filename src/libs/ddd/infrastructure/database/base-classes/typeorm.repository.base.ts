@@ -29,6 +29,10 @@ export abstract class TypeormRepositoryBase<
     protected readonly logger: Logger,
   ) {}
 
+  /**
+   * Specify relations to other tables.
+   * For example: `relations = ['user', ...]`
+   */
   protected abstract relations: string[];
 
   protected tableName = this.repository.metadata.tableName;
@@ -38,6 +42,7 @@ export abstract class TypeormRepositoryBase<
   ): WhereCondition<OrmEntity>;
 
   async save(entity: Entity): Promise<Entity> {
+    entity.validate(); // Protecting invariant before saving
     const ormEntity = this.mapper.toOrmEntity(entity);
     const result = await this.repository.save(ormEntity);
     await DomainEvents.publishEvents(
@@ -52,7 +57,10 @@ export abstract class TypeormRepositoryBase<
   }
 
   async saveMultiple(entities: Entity[]): Promise<Entity[]> {
-    const ormEntities = entities.map(entity => this.mapper.toOrmEntity(entity));
+    const ormEntities = entities.map(entity => {
+      entity.validate();
+      return this.mapper.toOrmEntity(entity);
+    });
     const result = await this.repository.save(ormEntities);
     await Promise.all(
       entities.map(entity =>
@@ -129,6 +137,7 @@ export abstract class TypeormRepositoryBase<
   }
 
   async delete(entity: Entity): Promise<Entity> {
+    entity.validate();
     await this.repository.remove(this.mapper.toOrmEntity(entity));
     await DomainEvents.publishEvents(
       entity.id,

@@ -30,8 +30,8 @@ export class UserEntity extends AggregateRoot<UserProps> {
     user.addEvent(
       new UserCreatedDomainEvent({
         aggregateId: id.value,
-        email: props.email.getRawProps(),
-        ...props.address.getRawProps(),
+        email: props.email.unpack(),
+        ...props.address.unpack(),
       }),
     );
     return user;
@@ -70,7 +70,7 @@ export class UserEntity extends AggregateRoot<UserProps> {
     // TODO: add example business logic
   }
 
-  static validate(props: UserProps): void {
+  validate(): void {
     // TODO: example
     // entity business rules validation to protect it's invariant
   }
